@@ -1,5 +1,54 @@
 \documentclass{article}
-\usepackage[utf8]{inputenc}
+\pagenumbering{gobble}
+\title{Analysis of Fekete Points}
+\author{Jesse Chan, Joseph Munar}
+\date{}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+
 \begin{document}
-(Type your content here.)
+\maketitle
+\nopagebreak
+\begin{abstract}
+Fekete Points are an adequate apporximation of Gauss-Legendre-Lobatto points for higher dimensions. This article attempts to analyze the effectiveness of Spline interpolation and applications using Fekete points. First, we attempt to recreate 1-Dimensional Gauss-Legendre-Lobatto points from Fekete points. Then we perform an error analysis on interpolation points using Fekete points for various maximum polynomial degrees and different sized knot vectors. We then compare the results to those performed for Gauss-Legendre-Lobatto points, uniform points, and Greville Abscissae. The report concludes with a formulation of variable problems for PDEs as well as an optimization to this process.
+\end{abstract}
+\section*{Introduction}
+\paragraph{}
+Throughout the field of optimization, interpolation is extensively used. One of the many types of interpolation points used is the Gauss-Legendre-Lobatto points. However, this set of interpolation points becomes expensive very quickly and very little is known about this set in higher dimensions. Thanks to *insert cite here*, we know that Fekete points are adequate approximations of GLL points in higher dimensions. This article investigates the usefulness of Fekete points as well as its effects on numerical methods.
+
+\section*{Fekete Points}
+\paragraph{}
+We begin with the realization that GLL points are calculated using the standard Lagrange basis, and thus utilizes the standard Vandermonde matrix. The easiest way to extrapolate this to a higher tensor product of lines in 2D space is by projecting this interpolation over fixed intervals within the domain. As such, utilizing Spline spaces is the most appropriate direction for this project.
+
+\subsection{Spline Basis}
+A general Spline Basis (or B-Spline) for this project will be defined as: A basis of piecewise polynomials of max N degrees. Spline spaces are constructed using a knot vector \textbf{t}
+\begin{equation*}
+\textbf{t}=\left\{a=t_1,...,t_{N+K+1}=b\right\},\qquad t_i<t_{i+1}.
+\end{equation*}
+where K is the number of non-overlapping sub-intervals within the spline space. The B-splines can thus be calculated recursively using:
+\begin{equation*}
+B^0_i(x)=\begin{cases}
+1, t_i\leq x\leq t_{i+1}\\
+0, otherwise.
+\end{cases}
+\qquad
+B^K_i(x)=\frac{x-t_i}{t_{i+N}-t_i}B^{K-1}_i(x)+\frac{t_{i+N+1}-x}{t_{i+N+1}-t_{i+1}}B^{K-1}_{i+1}(x).
+\end{equation*}
+To achieve a unique solution to a spline interpolation, the knot vector must contain N+1 copies of the boundary terms, and there must be $N+K$ interpolation points. This allows for the existence of a square matrix which contains the coefficients of the B-splines for a unique set of interpolation points and knot vector. The entries of this matrix can be calculated using deBoor$'$s algorithm. This matrix will be referred to in this article as the Spline Vandermonde Matrix.
+
+\subsection{Fekete Points Generation Algorithm}
+\paragraph{}
+A gradient ascension algorithm was used to generate the Fekete points for this project. As explained by (insert cite), one can apply $\frac{d\phi_i}{dr_i}$ to the $i\textsuperscript{th}$ node in the set of interpolation points recursively. Fekete points are achieved once 
+\begin{equation*}\frac{d\phi_i}{dr_i}\leq 10^{-12}.\end{equation*}
+
+Since we are working with a square Spline Vandermonde matrix, then $\frac{d\phi_i}{dr_i}$ for all global nodes will be the diagonal entries of the square derivative matrix. In general, the derivative of a spline can be calculated through the same method as the spline itself, but will be of max $N-1$ degrees and have a knot vector similar to the original spline but with the interior points duplicated. However, these derivatives are only locally defined, and require a map that will lead us to the global derivatives we desire. Applying a time stepping scheme such as Forward Euler or Runge Kutta 45 to the set of interpolation points and diagonal entries of the now-square derivative matrix give the desired Fekete interpolation points. As a precautionary check, setting $K=1$ in the algorithm should provide Fekete points that are equivalent to GLL points for any N.
+
+\section*{Error Analysis}
+\paragraph{}
+We approximated the Lebesque constant of serveral types of points for several different functions. Fekete points, uniform points, GLL points, and Greville Abscissae were all compared in this analysis.
+
+\section*{Variational Formulation for Time Dependent Problems}
+
+
 \end{document}
