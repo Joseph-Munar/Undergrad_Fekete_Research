@@ -29,8 +29,8 @@ A general Spline Basis (or B-Spline) for this project will be defined as: A basi
 where K is the number of non-overlapping sub-intervals within the spline space. The B-splines can thus be calculated recursively using:
 \begin{equation*}
 B^0_i(x)=\begin{cases}
-1, t_i\leq x\leq t_{i+1}\\
-0, otherwise.
+1,\quad t_i\leq x\leq t_{i+1}\\
+0,\quad otherwise.
 \end{cases}
 \qquad
 B^K_i(x)=\frac{x-t_i}{t_{i+N}-t_i}B^{K-1}_i(x)+\frac{t_{i+N+1}-x}{t_{i+N+1}-t_{i+1}}B^{K-1}_{i+1}(x).
@@ -43,10 +43,15 @@ A gradient ascension algorithm was used to generate the Fekete points for this p
 \begin{equation*}\frac{d\phi_i}{dr_i}\leq 10^{-12}.\end{equation*}
 
 Since we are working with a square Spline Vandermonde matrix, then $\frac{d\phi_i}{dr_i}$ for all global nodes will be the diagonal entries of the square derivative matrix. In general, the derivative of a spline can be calculated through the same method as the spline itself, but will be of max $N-1$ degrees and have a knot vector similar to the original spline but with the interior points duplicated. However, these derivatives are only locally defined, and require a map that will lead us to the global derivatives we desire. Applying a time stepping scheme such as Forward Euler or Runge Kutta 45 to the set of interpolation points and diagonal entries of the now-square derivative matrix give the desired Fekete interpolation points. As a precautionary check, setting $K=1$ in the algorithm should provide Fekete points that are equivalent to GLL points for any N.
+\newline\newline\newline
+\includegraphics[height = 5cm]{K_1_check.png} \includegraphics[height = 5cm]{K_1_error.png}
 
 \section*{Error Analysis}
 \paragraph{}
-We approximated the Lebesque constant of serveral types of points for several different functions. Fekete points, uniform points, GLL points, and Greville Abscissae were all compared in this analysis. (still not done)
+We approximated the Lebesque constant of serveral types of points for several different functions. Fekete points, uniform points, GLL points, and Greville Abscissae were all compared in this analysis.
+\newline
+\includegraphics[height = 5cm]{Uniform.png} \includegraphics[height = 5cm]{GLL.png}
+\includegraphics[height = 5cm]{Fekete.png} \includegraphics[height = 5cm]{Greville.png}
 
 \section*{Variational Formulation for Time Dependent Problems}
 \paragraph{}
@@ -66,7 +71,7 @@ where M is the mass matrix and K is the stiffness matrix defined as:
 \begin{equation*}
 M_{i,j}=\int ^1_{-1}\phi _i(x)\phi _j(x)dx,\qquad K_{i,j}=\int ^1_{-1}\frac{\partial \phi _i}{\partial x}\frac{\partial \phi _j}{\partial x}dx
 \end{equation*}
-These equations can be solved using quadrature approximations, so we used Gaussian Quadrature points for this process. Using a Forward Euler approach, we get an explicit time leapfrogging method that can be iterated through to obtain a solution vector $\vec{u}$ for any time, t.
+These equations can be solved using quadrature approximations, so we used Gaussian Quadrature points for this process. Using a Forward Euler approach, we get an explicit time leapfrogging method.
 
 \paragraph{}
 Next, we attempt to optimize the system using a mass lumping technique. That is, we force the mass matrix to be a diagonal matrix. For this, we switch from Gaussian Quadrature points to a set of nodal points. GLL points would be perfect, however, we'll switch to Fekete points to use the increased accuracy of higher tensor products. Let us introduce the equality of interpolation points: 
@@ -74,7 +79,9 @@ Next, we attempt to optimize the system using a mass lumping technique. That is,
 (qF)^T\times \vec{wF}=(qQ)^T\times \vec{wQ}
 \end{equation*}
 where $qF$ and $qQ$ are the quadrature matrices for Fekete and Gaussian Quadrature points, and $\vec{wF}$ and $\vec{wQ}$ are their respective weight vectors.
-We can derive the weights of Fekete points from Gaussian Quadrature points using this equation. The only issue is that Fekete points are only an approximation of GLL points. Thus this equality may not be exact for higher tensor products. The error, as a result, may increase at a higher rate than expected. The results of the mass lumping approximation for time, $t=1$ are below: (insert graphs)
+We can derive the weights of Fekete points from Gaussian Quadrature points using this equation. The only issue is that Fekete points are only an approximation of GLL points. Thus this equality may not be exact for higher tensor products. The error, as a result, may increase at a higher rate than expected. The results of the mass lumping approximation for time, $t=1$ are below:
+\newline
+\includegraphics[height = 5cm]{Wave_3rd_error.png} \includegraphics[height = 5cm]{Wave_4th_error.png}
 
 
 \end{document}
