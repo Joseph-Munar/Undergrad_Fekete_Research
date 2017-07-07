@@ -6,22 +6,28 @@
 
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{csvsimple,booktabs,array,siunitx}
+\usepackage{filecontents}
+
+\begin{filecontent*}{2KnotFeketeMeshes.xlsx}
+
+\end{}
 
 \begin{document}
 \maketitle
 \nopagebreak
 \begin{abstract}
-Fekete Points are an adequate apporximation of Gauss-Legendre-Lobatto points for higher dimensions. This article attempts to analyze the effectiveness of Spline interpolation and applications using Fekete points. First, we attempt to recreate 1-Dimensional Gauss-Legendre-Lobatto points from Fekete points. Then we perform an error analysis on interpolation points using Fekete points for various maximum polynomial degrees and different sized knot vectors. We then compare the results to those performed for Gauss-Legendre-Lobatto points, uniform points, and Greville Abscissae. The report concludes with a formulation of variable problems for PDEs as well as an optimization to this process.
+This article attempts to analyze the effectiveness of Spline interpolation and applications using Fekete points. First, we attempt to recreate 1-Dimensional Gauss-Legendre-Lobatto points from Fekete points. We then proced to demonstrate a formulation of variable problems for PDEs as well as an optimization to this process. Then we perform an error analysis on interpolation points using Fekete points for various maximum polynomial degrees and different sized knot vectors. We then compare the results to those performed for Gauss-Legendre-Lobatto points, uniform points, and Greville Abscissae. The report concludes with results and notes on the collocation procedure and optimization.
 \end{abstract}
 \section*{Introduction}
 \paragraph{}
-Throughout the field of optimization, interpolation is extensively used. One of the many types of interpolation points used is the Gauss-Legendre-Lobatto points. However, this set of interpolation points becomes expensive very quickly and very little is known about this set in higher dimensions. Thanks to *insert cite here*, we know that Fekete points are adequate approximations of GLL points in higher dimensions. This article investigates the usefulness of Fekete points as well as its effects on numerical methods.
+Fekete Points are known to be the Gauss-Legendre-Lobatto points for the line and its tensor products, and has been determined to be an adequate approximation of Gauss-Legendre-Lobatto points on the traingle and its tensor products. (cite here) has determined an approach to calculating Fekete points which allows further study into its applications. In this article, we analyze the effectiveness of Fekete points for interpolation using B-splines. A general algorithm for calculating B-splines was created by deBoor. He also showed a very important note for this article: that the condition number of a B-spline basis increases exponentially as K increases.
 
 \section*{Fekete Points}
 \paragraph{}
-We begin with the realization that GLL points are calculated using the standard Lagrange basis, and thus utilizes the standard Vandermonde matrix. The easiest way to extrapolate this to a higher tensor product of lines in 2D space is by projecting this interpolation over fixed intervals within the domain. As such, utilizing Spline spaces is the most appropriate direction for this project.
+We begin with the realization that GLL points are calculated using the standard Lagrange basis, and thus utilizes the standard Vandermonde matrix. The easiest way to extrapolate this to a higher tensor product of lines in singular dimension is by projecting this interpolation over fixed intervals within the domain. As such, utilizing Spline spaces is the most appropriate direction for this project.
 
-\subsection{Spline Basis}
+\subsection*{Spline Basis}
 A general Spline Basis (or B-Spline) for this project will be defined as: A basis of piecewise polynomials of max N degrees. Spline spaces are constructed using a knot vector \textbf{t}
 \begin{equation*}
 \textbf{t}=\left\{a=t_1,...,t_{N+K+1}=b\right\},\qquad t_i<t_{i+1}.
@@ -35,9 +41,12 @@ B^0_i(x)=\begin{cases}
 \qquad
 B^K_i(x)=\frac{x-t_i}{t_{i+N}-t_i}B^{K-1}_i(x)+\frac{t_{i+N+1}-x}{t_{i+N+1}-t_{i+1}}B^{K-1}_{i+1}(x).
 \end{equation*}
-To achieve a unique solution to a spline interpolation, the knot vector must contain N+1 copies of the boundary terms, and there must be $N+K$ interpolation points. This allows for the existence of a square matrix which contains the coefficients of the B-splines for a unique set of interpolation points and knot vector. The entries of this matrix can be calculated using deBoor$'$s algorithm. This matrix will be referred to in this article as the Spline Vandermonde Matrix.
 
-\subsection{Fekete Points Generation Algorithm}
+\subsection*{Interpolation}
+\paragraph{}
+To achieve a unique solution to a spline interpolation, the knot vector must contain $N+1$ copies of the boundary terms, and there must be $N+K$ interpolation points. This allows for the existence of a square matrix which contains the coefficients of the B-splines for a unique set of interpolation points and knot vector. The entries of this matrix can be calculated using deBoor$'$s algorithm. This matrix will be referred to in this article as the Spline Vandermonde matrix. Inverting the Spline Vandermonde matrix gives the solution vector to the interpolation points.
+
+\subsection*{Fekete Points Generation Algorithm}
 \paragraph{}
 A gradient ascension algorithm was used to generate the Fekete points for this project. As explained by (insert cite), one can apply $\frac{d\phi_i}{dr_i}$ to the $i\textsuperscript{th}$ node in the set of interpolation points recursively. Fekete points are achieved once 
 \begin{equation*}\frac{d\phi_i}{dr_i}\leq 10^{-12}.\end{equation*}
@@ -46,16 +55,10 @@ Since we are working with a square Spline Vandermonde matrix, then $\frac{d\phi_
 \newline\newline\newline
 \includegraphics[height = 5cm]{K_1_check.png} \includegraphics[height = 5cm]{K_1_error.png}
 
-\section*{Error Analysis}
-\paragraph{}
-We approximated the Lebesque constant of serveral types of points for several different functions. Fekete points, uniform points, GLL points, and Greville Abscissae were all compared in this analysis.
-\newline
-\includegraphics[height = 5cm]{Uniform.png} \includegraphics[height = 5cm]{GLL.png}
-\includegraphics[height = 5cm]{Fekete.png} \includegraphics[height = 5cm]{Greville.png}
-
 \section*{Variational Formulation for Time Dependent Problems}
+\subsection*{Finite Element Formulation}
 \paragraph{}
-Finally, we attempt a classic finite element method approach to time dependent partial differential equations using B-Splines. We$'$ll attempt this on the 1-D Wave Equation with homogeneous Neumann boundary and initial conditions: 
+Next, we attempt a classic finite element method approach to time dependent partial differential equations using B-Splines. We$'$ll attempt this on the 1-D Wave Equation with homogeneous Neumann boundary and initial conditions: 
 \begin{equation*}
 \frac{\partial ^2 u}{\partial t^2} = c^2\frac{\partial ^2 u}{\partial x^2},\quad \frac{\partial u}{\partial x}(-1,t)=\frac{\partial u}{\partial x}(1,t)=0, \frac{\partial u}{\partial t}(x,0)=0
 \end{equation*}
@@ -73,15 +76,47 @@ M_{i,j}=\int ^1_{-1}\phi _i(x)\phi _j(x)dx,\qquad K_{i,j}=\int ^1_{-1}\frac{\par
 \end{equation*}
 These equations can be solved using quadrature approximations, so we used Gaussian Quadrature points for this process. Using a Forward Euler approach, we get an explicit time leapfrogging method.
 
+\subsection*{Mass-Lumping}
 \paragraph{}
 Next, we attempt to optimize the system using a mass lumping technique. That is, we force the mass matrix to be a diagonal matrix. For this, we switch from Gaussian Quadrature points to a set of nodal points. GLL points would be perfect, however, we'll switch to Fekete points to use the increased accuracy of higher tensor products. Let us introduce the equality of interpolation points: 
 \begin{equation*}
-(qF)^T\times \vec{wF}=(qQ)^T\times \vec{wQ}
+(qG)^T\times \vec{wG}=(qQ)^T\times \vec{wQ}
 \end{equation*}
-where $qF$ and $qQ$ are the quadrature matrices for Fekete and Gaussian Quadrature points, and $\vec{wF}$ and $\vec{wQ}$ are their respective weight vectors.
-We can derive the weights of Fekete points from Gaussian Quadrature points using this equation. The only issue is that Fekete points are only an approximation of GLL points. Thus this equality may not be exact for higher tensor products. The error, as a result, may increase at a higher rate than expected. The results of the mass lumping approximation for time, $t=1$ are below:
+where $qG$ and $qQ$ are the quadrature matrices for GLL and Gaussian Quadrature points, and $\vec{wG}$ and $\vec{wQ}$ are their respective weight vectors. Because Fekete points are approximations of GLL points, we can utilize this formula to derive the weights of Fekete points. However, since it is only an approximation, equality won't necessarily be true. Thus this equality may not be exact for higher tensor products - specifically odd tensor products. The error, as a result, may increase at a higher rate than expected.
+
+\section*{Numerical Experiments}
+\subsection*{Convergence of Time-Stepping to Achieve Fekete Points}
+\paragraph{}
+Part of any gradient ascension algorithm is the time-step needed. In the case of this generation algorithm, it seems a very small time-step is needed. Through experimentation, it was observed that a higher N and/or K requires a smaller time-step. This is most likely a side effect of the Spline Vandermonde matrix becoming more unstable with higher N and K. A suitable formula to determine the time step needed seems to be $dt = \frac{1}{200\times N\times K}$
+
+\subsection*{Analysis on Fekete Points and Greville Abscissae}
+\paragraph{}
+Greville Abscissae are the averages of a knot vector. Because of this, they have been used extensively for interpolation using B-Splines. Initial error analysis of the two types of interpolation points show they have very similar results.
+\paragraph{}
+Further inspection of the points show they are almost identical. As N and K increase, more interior points of both types of interpolation points converge to the same results. The exterior points will never be the same due to how they are defined. For all other points, Fekete points seem to be more spread out whereas Greville abscissae seem to clump more towards the middle of the knot vector.
+\subsection*{Interpolation Errors}
+\paragraph{}
+We first examine the error for two smooth functions using GLL points, Fekete Points, uniform points, and Greville abscissae. As previously mentioned, the Spline Vandermonde matrix has a higher condition number as K and N increase. This effect is seen in both the uniform points graph and the Fekete Points graph. Fekete Points are affected by this more than Greville Abscissae most likely because Fekete Points are generated using a B-spline basis. The results are shown below:
+\newline
+\includegraphics[height = 2.5cm]{SinUniform.png} \includegraphics[height = 2.5cm]{SinGLL.png}
+\includegraphics[height = 2.5cm]{SinFekete.png} \includegraphics[height = 2.5cm]{SinGreville.png}
+\includegraphics[height = 2.5cm]{ExpUniform.png} \includegraphics[height = 2.5cm]{ExpGLL.png}
+\includegraphics[height = 2.5cm]{ExpFekete.png} \includegraphics[height = 2.5cm]{ExpGreville.png}
+
+\paragraph{}
+We then decided to examine the error for two smooth functions that experience the Runge phenomenon when interpolated. The same types of interpolation points were used. It was at this point where we first noticed the similarities between the Greville Abscissae and Fekete Points. Another important note is that a B-spline basis helps dramatically reduce the effects of Runge's Phenomenon:
+\newline
+\includegraphics[height = 2.5cm]{CosExpUniform.png} \includegraphics[height = 2.5cm]{CosExpGLL.png}
+\includegraphics[height = 2.5cm]{CosExpFekete.png} \includegraphics[height = 2.5cm]{CosExpGreville.png}
+\includegraphics[height = 2.5cm]{RungeUniform.png} \includegraphics[height = 2.5cm]{RungeGLL.png}
+\includegraphics[height = 2.5cm]{RungeFekete.png} \includegraphics[height = 2.5cm]{RungeGreville.png}
+
+\subsection*{Mass-Lumping}
+The results of the mass lumping approximation for time, $t=1$ are below:
 \newline
 \includegraphics[height = 5cm]{Wave_3rd_error.png} \includegraphics[height = 5cm]{Wave_4th_error.png}
 
+\section*{Appendix}
+Below, we have listed tables of points used in these experiments:
 
 \end{document}
