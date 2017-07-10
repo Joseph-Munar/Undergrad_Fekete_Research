@@ -48,7 +48,7 @@ A gradient ascension algorithm was used to generate the Fekete points for this p
 \begin{equation*}\frac{d\phi_i}{dr_i}\leq 10^{-12}.\end{equation*}
 
 Since we are working with a square Spline Vandermonde matrix, then $\frac{d\phi_i}{dr_i}$ for all global nodes will be the diagonal entries of the square derivative matrix. In general, the derivative of a spline can be calculated through the same method as the spline itself, but will be of max $N-1$ degrees and have a knot vector similar to the original spline but with the interior points duplicated. However, these derivatives are only locally defined, and require a map that will lead us to the global derivatives we desire. Applying a time stepping scheme such as Forward Euler or Runge Kutta 45 to the set of interpolation points and diagonal entries of the now-square derivative matrix give the desired Fekete interpolation points. As a precautionary check, setting $K=1$ in the algorithm should provide Fekete points that are equivalent to GLL points for any N.
-\newline\newline\newline
+\newline\newline\newline\hspace*{-0.5cm}
 \includegraphics[height = 5cm]{K_1_check.png} \includegraphics[height = 5cm]{K_1_error.png}
 
 \section*{Variational Formulation for Time Dependent Problems}
@@ -70,15 +70,27 @@ where M is the mass matrix and K is the stiffness matrix defined as:
 \begin{equation*}
 M_{i,j}=\int ^1_{-1}\phi _i(x)\phi _j(x)dx,\qquad K_{i,j}=\int ^1_{-1}\frac{\partial \phi _i}{\partial x}\frac{\partial \phi _j}{\partial x}dx
 \end{equation*}
-These equations can be solved using quadrature approximations, so we used Gaussian Quadrature points for this process. Using a Forward Euler approach, we get an explicit time leapfrogging method.
+These equations can be solved using quadrature approximations:
+\begin{equation*}
+M_{i,j}=\sum _{i,j=0}^N w_i\phi _i(x)\phi _j(x),\qquad K_{i,j}=\sum _{i,j=0}^N w_i\frac{\partial \phi _i}{\partial x}\frac{\partial \phi _j}{\partial x}
+\end{equation*}
+Where $w_i$ is the weight of the $i\textsuperscript{th}$ interpolation point. To easily calculate these weights, we used Gaussian Quadrature points. Using a Forward Euler approach, we get an explicit time leapfrogging method:
+\begin{equation*}
+\vec{a}^{(t+2)} = -M^{-1}K\vec{a}^{(t+1)}(c\times dt)^2+2\vec{a}^{(t+1)} - \vec{a}^{(t)}
+\end{equation*}
 
 \subsection*{Mass-Lumping}
 \paragraph{}
-Next, we attempt to optimize the system using a mass lumping technique. That is, we force the mass matrix to be a diagonal matrix. For this, we switch from Gaussian Quadrature points to a set of nodal points. GLL points would be perfect, however, we'll switch to Fekete points to use the increased accuracy of higher tensor products. Let us introduce the equality of interpolation points: 
+As for any explicit time stepping scheme, the mass matrix must be solved. However, these matrices are completely dense, and inversion quickly becomes less feasible and more numerically taxing as $K$ and $N$ increase. We wish to simplify this hardship by replacing the dense matrix with a diagonal matrix - a mass-lumped matrix. For this, we switch from Gaussian Quadrature points to a set of nodal points such as GLL points. Since we already have calculated the weights of the Gaussian Quadrature points and we can easily calculate the quadrature matrices of both types of points, we can derive the weights of the GLL points using: 
 \begin{equation*}
 (qG)^T\times \vec{wG}=(qQ)^T\times \vec{wQ}
 \end{equation*}
-where $qG$ and $qQ$ are the quadrature matrices for GLL and Gaussian Quadrature points, and $\vec{wG}$ and $\vec{wQ}$ are their respective weight vectors. Because Fekete points are approximations of GLL points, we can utilize this formula to derive the weights of Fekete points. However, since it is only an approximation, equality won't necessarily be true. Thus this equality may not be exact for higher tensor products - specifically odd tensor products. The error, as a result, may increase at a higher rate than expected.
+where $qG$ and $qQ$ are the quadrature matrices for GLL and Gaussian Quadrature points, and $\vec{wG}$ and $\vec{wQ}$ are their respective weight vectors. Choosing to use Fekete points allow us to utilize the increased accuracy provided from the subintervals of the B-Spline basis. Using a nodal basis forces the Spline Vandermonde matrix to be the identity matrix. Therefore, the now-mass-lumped mass matrix, $M_L$ is defined as:
+\begin{equation*}
+M_{L_{i,j}}=\begin{cases}
+\vec{wG}_i,\quad i=j\\ 0,\quad otherwise.
+\end{cases}
+\end{equation*}
 
 \section*{Numerical Experiments}
 \subsection*{Convergence of Time-Stepping to Achieve Fekete Points}
@@ -90,27 +102,31 @@ Part of any gradient ascension algorithm is the time-step needed. In the case of
 Greville Abscissae are the averages of a knot vector. Because of this, they have been used extensively for interpolation using B-Splines. Initial error analysis of the two types of interpolation points show they have very similar results.
 \paragraph{}
 Further inspection of the points show they are almost identical. As N and K increase, more interior points of both types of interpolation points converge to the same results. The exterior points will never be the same due to how they are defined. For all other points, Fekete points seem to be more spread out whereas Greville abscissae seem to clump more towards the middle of the knot vector.
+\hspace*{-1.75cm}\includegraphics[height = 4cm]{Difference_N_2.png}\includegraphics[height = 4cm]{Difference_N_4.png}\includegraphics[height = 4cm]{Difference_N_7.png}
 \subsection*{Interpolation Errors}
 \paragraph{}
 We first examine the error for two smooth functions using GLL points, Fekete Points, uniform points, and Greville abscissae. As previously mentioned, the Spline Vandermonde matrix has a higher condition number as K and N increase. This effect is seen in both the uniform points graph and the Fekete Points graph. Fekete Points are affected by this more than Greville Abscissae most likely because Fekete Points are generated using a B-spline basis. The results are shown below:
-\newline
+\newline\hspace*{-0.5cm}
 \includegraphics[height = 2.5cm]{SinUniform.png} \includegraphics[height = 2.5cm]{SinGLL.png}
 \includegraphics[height = 2.5cm]{SinFekete.png} \includegraphics[height = 2.5cm]{SinGreville.png}
-\includegraphics[height = 2.5cm]{ExpUniform.png} \includegraphics[height = 2.5cm]{ExpGLL.png}
+\hspace*{-0.5cm}\includegraphics[height = 2.5cm]{ExpUniform.png} \includegraphics[height = 2.5cm]{ExpGLL.png}
 \includegraphics[height = 2.5cm]{ExpFekete.png} \includegraphics[height = 2.5cm]{ExpGreville.png}
 
 \paragraph{}
 We then decided to examine the error for two smooth functions that experience the Runge phenomenon when interpolated. The same types of interpolation points were used. It was at this point where we first noticed the similarities between the Greville Abscissae and Fekete Points. Another important note is that a B-spline basis helps dramatically reduce the effects of Runge's Phenomenon:
-\newline
+\newline\hspace*{-0.5cm}
 \includegraphics[height = 2.5cm]{CosExpUniform.png} \includegraphics[height = 2.5cm]{CosExpGLL.png}
 \includegraphics[height = 2.5cm]{CosExpFekete.png} \includegraphics[height = 2.5cm]{CosExpGreville.png}
-\includegraphics[height = 2.5cm]{RungeUniform.png} \includegraphics[height = 2.5cm]{RungeGLL.png}
+\hspace*{-0.5cm}\includegraphics[height = 2.5cm]{RungeUniform.png} \includegraphics[height = 2.5cm]{RungeGLL.png}
 \includegraphics[height = 2.5cm]{RungeFekete.png} \includegraphics[height = 2.5cm]{RungeGreville.png}
 
 \subsection*{Mass-Lumping}
 The results of the mass lumping approximation for time, $t=1$ are below:
-\newline
+\newline\hspace*{-0.5cm}
 \includegraphics[height = 5cm]{Wave_3rd_error.png} \includegraphics[height = 5cm]{Wave_4th_error.png}
+
+An important note of this procedure: Fekete points are only an approximation of GLL points, this equation will also only be an approximation. Thus the derived weight vector may not be exact. The error, as a result, will increase at a higher rate than expected when using more than one sub-interval.
+
 
 \section*{Appendix}
 Below, we have listed tables of points used in these experiments:
