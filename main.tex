@@ -102,7 +102,8 @@ Part of any gradient ascension algorithm is the time-step needed. In the case of
 Greville Abscissae are the averages of a knot vector. Because of this, they have been used extensively for interpolation using B-Splines. Initial error analysis of the two types of interpolation points show they have very similar results.
 \paragraph{}
 Further inspection of the points show they are almost identical. As N and K increase, more interior points of both types of interpolation points converge to the same results. The exterior points will never be the same due to how they are defined. For all other points, Fekete points seem to be more spread out whereas Greville abscissae seem to clump more towards the middle of the knot vector.
-\hspace*{-1.75cm}\includegraphics[height = 4cm]{Difference_N_2.png}\includegraphics[height = 4cm]{Difference_N_4.png}\includegraphics[height = 4cm]{Difference_N_7.png}
+\hspace*{-2cm}\includegraphics[width = 8cm]{Difference_N_2.png}\includegraphics[width = 8cm]{Difference_N_3.png}
+\hspace*{-2cm}\includegraphics[width = 8cm]{Difference_N_4.png}\includegraphics[width = 8cm]{Difference_N_7.png}
 \subsection*{Interpolation Errors}
 \paragraph{}
 We first examine the error for two smooth functions using GLL points, Fekete Points, uniform points, and Greville abscissae. As previously mentioned, the Spline Vandermonde matrix has a higher condition number as K and N increase. This effect is seen in both the uniform points graph and the Fekete Points graph. Fekete Points are affected by this more than Greville Abscissae most likely because Fekete Points are generated using a B-spline basis. The results are shown below:
@@ -129,6 +130,6 @@ An important note of this procedure: Fekete points are only an approximation of 
 
 
 \section*{Appendix}
-Below, we have listed tables of points used in these experiments:
+A list of Fekete points for $K=4-256$ for $N=2-7$ have been written into 6 Excel documents saved on the public Github repository.
 
 \end{document}
