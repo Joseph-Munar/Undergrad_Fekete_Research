@@ -91,6 +91,30 @@ M_{L_{i,j}}=\begin{cases}
 \vec{wG}_i,\quad i=j\\ 0,\quad otherwise.
 \end{cases}
 \end{equation*}
+However, since Fekete points are only approximations of GLL points, this diagonal matrix will not naturally be achieved. To fix this,we force the diagonalization of M by defining a diagonal matrix, $M_L$, whose diagonal entries are the weights of the Fekete points. Next, we implement a predictor-corrector method to revert our diagonal matrix to the originally dense mass matrix.
+
+\noindent If we consider the general form of a Forward Euler system, we have:
+\begin{equation*}
+Mx=b
+\end{equation*}
+Using the recursion relationship:
+\begin{equation*}
+M_Lx^{(i+1)}=b-AM_Lx^{(i)}
+\end{equation*}
+where $A=MM^{-1}-Id$. According to (insert cite here), these matrices are guaranteed
+to converge to the solution, $M$. The numeric approximation achieved will be labeled $M_r$ where $r$ is arbitrarily chosen and $M_r$ is defined as:
+\begin{equation*}
+M_r:=\left( \sum _{i=0}^{r-1}(-A)^{i}\right) ^{-1} M_L
+\end{equation*}
+We then replace the previous system with the new numeric approximation:
+\begin{equation*}
+M_rx=b
+\end{equation*}
+When can then expand the equation using the definition of $M_r$ and solve for $x$. This gives the final form of the equation:
+\begin{equation*}
+x=M_L^{-1}\sum _{i=0}^{r-1}(-A)^{i}b
+\end{equation*}
+In this form, both $M$ and $M_L$ are used, however, it is important to note that only $M_L$ is inverted. 
 
 \section*{Numerical Experiments}
 \subsection*{Convergence of Time-Stepping to Achieve Fekete Points}
@@ -125,8 +149,8 @@ We then decided to examine the error for two smooth functions that experience th
 The results of the mass lumping approximation for time, $t=1$ are below:
 \newline\hspace*{-0.5cm}
 \includegraphics[height = 5cm]{Wave_3rd_error.png} \includegraphics[height = 5cm]{Wave_4th_error.png}
-
-An important note of this procedure: Fekete points are only an approximation of GLL points, this equation will also only be an approximation. Thus the derived weight vector may not be exact. The error, as a result, will increase at a higher rate than expected when using more than one sub-interval.
+\paragraph{}
+The variable $r$ was never defined as a limit of any kind. It is simply an arbitrarily indicator for how accurate a system is desired to be - in this case, that system is the Mass matrix. An important observation made was that $r$ does not depend on $N$ nor $K$. Therefore, $r$ can remain a singular constant for any desire Spline Vandermonde matrix. Numerical experiments found $r$ to be acceptably accurate at $r=80$.
 
 
 \section*{Appendix}
