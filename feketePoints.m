@@ -27,6 +27,6 @@ end
 if 0
     X = [num2str(N),'KnotFeketeMeshes.xlsx'];
     R = xlsread(X);
-    r = R(K,1:(K+N+3))';
+    r = R(K-3,1:(K+N))';
 end
 return
